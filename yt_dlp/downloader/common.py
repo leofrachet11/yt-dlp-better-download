@@ -120,18 +120,21 @@ class FileDownloader:
     def FD_NAME(cls):
         return re.sub(r'(?<=[a-z])(?=[A-Z])', '_', cls.__name__[:-2]).lower()
 
+    last_seconds = None
+
     @staticmethod
-    def format_seconds(seconds):
+    def format_seconds(self, seconds):
         if seconds is None:
-            return ' Unknown'
+            return self.last_seconds
         time = timetuple_from_msec(seconds * 1000)
         if time.hours > 99:
             return '--:--:--'
-        return '%02d:%02d:%02d' % time[:-1]
+        self.last_seconds = '%02d:%02d:%02d' % time[:-1]
+        return self.last_seconds
 
     @classmethod
-    def format_eta(cls, seconds):
-        return f'{remove_start(cls.format_seconds(seconds), "00:"):>8s}'
+    def format_eta(self, cls, seconds):
+        return f'{remove_start(cls.format_seconds(self, seconds), "00:")}'
 
     @staticmethod
     def calc_percent(byte_counter, data_len):
@@ -141,7 +144,7 @@ class FileDownloader:
 
     @staticmethod
     def format_percent(percent):
-        return '  N/A%' if percent is None else f'{percent:>5.1f}%'
+        return 'N/A%' if percent is None else f'{round(percent)}%'
 
     @classmethod
     def calc_eta(cls, start_or_rate, now_or_remaining, total=NO_DEFAULT, current=NO_DEFAULT):
@@ -166,9 +169,15 @@ class FileDownloader:
             return None
         return float(bytes) / dif
 
+    last_speed = None
+
     @staticmethod
-    def format_speed(speed):
-        return ' Unknown B/s' if speed is None else f'{format_bytes(speed):>10s}/s'
+    def format_speed(self, speed):
+        if speed is None:
+            return self.last_speed 
+        else:
+            self.last_speed = f'{format_bytes(speed)}/s'
+            return self.last_speed
 
     @staticmethod
     def format_retries(retries):
@@ -331,7 +340,7 @@ class FileDownloader:
 
         progress_template = self.params.get('progress_template', {})
         self._multiline.print_at_line(self.ydl.evaluate_outtmpl(
-            progress_template.get('download') or '[download] %(progress._default_template)s',
+            progress_template.get('download') or '%(progress._default_template)s',
             progress_dict), s.get('progress_idx') or 0)
         self.to_console_title(self.ydl.evaluate_outtmpl(
             progress_template.get('download-title') or 'yt-dlp %(progress._default_template)s',
@@ -348,7 +357,7 @@ class FileDownloader:
                     return tmpl
             return default
 
-        _format_bytes = lambda k: f'{format_bytes(s.get(k)):>10s}'
+        _format_bytes = lambda k: f'{format_bytes(s.get(k))}'
 
         if s['status'] == 'finished':
             if self.params.get('noprogress'):
@@ -356,13 +365,14 @@ class FileDownloader:
             speed = try_call(lambda: s['total_bytes'] / s['elapsed'])
             s.update({
                 'speed': speed,
-                '_speed_str': self.format_speed(speed).strip(),
+                'percent': 100,
+                '_speed_str': self.format_speed(self, speed).strip(),
                 '_total_bytes_str': _format_bytes('total_bytes'),
-                '_elapsed_str': self.format_seconds(s.get('elapsed')),
+                '_elapsed_str': self.format_seconds(self, s.get('elapsed')),
                 '_percent_str': self.format_percent(100),
             })
             self._report_progress_status(s, join_nonempty(
-                '100%%',
+                with_fields(('percent', '%(_percent_str)s')),
                 with_fields(('total_bytes', 'of %(_total_bytes_str)s')),
                 with_fields(('elapsed', 'in %(_elapsed_str)s')),
                 with_fields(('speed', 'at %(_speed_str)s')),
@@ -378,8 +388,8 @@ class FileDownloader:
                 self._progress_delta_time += update_delta
 
         s.update({
-            '_eta_str': self.format_eta(s.get('eta')).strip(),
-            '_speed_str': self.format_speed(s.get('speed')),
+            '_eta_str': self.format_eta(self, s.get('eta')).strip(),
+            '_speed_str': self.format_speed(self, s.get('speed')),
             '_percent_str': self.format_percent(try_call(
                 lambda: 100 * s['downloaded_bytes'] / s['total_bytes'],
                 lambda: 100 * s['downloaded_bytes'] / s['total_bytes_estimate'],
@@ -387,7 +397,7 @@ class FileDownloader:
             '_total_bytes_str': _format_bytes('total_bytes'),
             '_total_bytes_estimate_str': _format_bytes('total_bytes_estimate'),
             '_downloaded_bytes_str': _format_bytes('downloaded_bytes'),
-            '_elapsed_str': self.format_seconds(s.get('elapsed')),
+            '_elapsed_str': self.format_seconds(self, s.get('elapsed')),
         })
 
         msg_template = with_fields(

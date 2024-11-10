@@ -1739,13 +1739,13 @@ def format_decimal_suffix(num, fmt='%d%s', *, factor=1000):
     exponent = 0 if num == 0 else min(int(math.log(num, factor)), len(POSSIBLE_SUFFIXES))
     suffix = ['', *POSSIBLE_SUFFIXES][exponent]
     if factor == 1024:
-        suffix = {'k': 'Ki', '': ''}.get(suffix, f'{suffix}i')
+        suffix = {'k': 'K', '': ''}.get(suffix, suffix)
     converted = num / (factor ** exponent)
     return fmt % (converted, suffix)
 
 
 def format_bytes(bytes):
-    return format_decimal_suffix(bytes, '%.2f%sB', factor=1024) or 'N/A'
+    return format_decimal_suffix(bytes, '%d%sB', factor=1024) or 'N/A'
 
 
 def lookup_unit_table(unit_table, s, strict=False):

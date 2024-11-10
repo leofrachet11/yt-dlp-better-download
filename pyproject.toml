@@ -3,15 +3,11 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "yt-dlp"
-maintainers = [
-    {name = "pukkandan", email = "pukkandan.ytdlp@gmail.com"},
-    {name = "Grub4K", email = "contact@grub4k.xyz"},
-    {name = "bashonly", email = "bashonly@protonmail.com"},
-    {name = "coletdjnz", email = "coletdjnz@protonmail.com"},
-    {name = "sepro", email = "sepro@sepr0.com"},
+name = "yt-dlp-better-download"
+authors = [
+    { name = "Leo Frachet", email = "leofrachet@leowebspace.com" }
 ]
-description = "A feature-rich command-line audio/video downloader"
+description = "A customized version of yt-dlp with improved download formatting"
 readme = "README.md"
 requires-python = ">=3.9"
 keywords = [
@@ -88,9 +84,7 @@ pyinstaller = [
 
 [project.urls]
 Documentation = "https://github.com/yt-dlp/yt-dlp#readme"
-Repository = "https://github.com/yt-dlp/yt-dlp"
-Tracker = "https://github.com/yt-dlp/yt-dlp/issues"
-Funding = "https://github.com/yt-dlp/yt-dlp/blob/master/Collaborators.md#collaborators"
+Repository = "https://github.com/leofrachet11/yt-dlp-better-download"
 
 [project.scripts]
 yt-dlp = "yt_dlp:main"
@@ -104,7 +98,6 @@ include = [
     "/devscripts",
     "/test",
     "/.gitignore",  # included by default, needed for auto-excludes
-    "/Changelog.md",
     "/LICENSE",  # included as license
     "/pyproject.toml",  # included by default
     "/README.md",  # included as readme
