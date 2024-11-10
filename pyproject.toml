@@ -4,9 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "yt-dlp-better-download"
-authors = [
-    { name = "Leo Frachet", email = "leofrachet@leowebspace.com" }
-]
+version = "1.0.0"
+authors = [{ name = "Leo Frachet", email = "leofrachet@leowebspace.com" }]
 description = "A customized version of yt-dlp with improved download formatting"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -36,7 +35,6 @@ classifiers = [
     "License :: OSI Approved :: The Unlicense (Unlicense)",
     "Operating System :: OS Independent",
 ]
-dynamic = ["version"]
 dependencies = []
 
 [project.optional-dependencies]
@@ -122,10 +120,6 @@ artifacts = ["/yt_dlp/extractor/lazy_extractors.py"]
 "completions/fish/yt-dlp.fish" = "share/fish/vendor_completions.d/yt-dlp.fish"
 "README.txt" = "share/doc/yt_dlp/README.txt"
 "yt-dlp.1" = "share/man/man1/yt-dlp.1"
-
-[tool.hatch.version]
-path = "yt_dlp/version.py"
-pattern = "_pkg_version = '(?P<version>[^']+)'"
 
 [tool.hatch.envs.default]
 features = ["curl-cffi", "default"]
